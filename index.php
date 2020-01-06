@@ -38,14 +38,21 @@
             }
             return $arr;
         }
-        function addCourse()
-        {
 
-        }
-        function updateCourse()
+        function addCourse($code, $name, $prog, $plan)
         {
-
+            $sql = $this->dbconn->prepare("INSERT INTO Courses (Code, Name, Progression, PlanURL) VALUES (?, ?, ?, ?)");
+            $sql->bind_param('ssss', $code, $name, $prog, $plan);
+            $sql->execute();
         }
+
+        function updateCourse($code, $name, $prog, $plan)
+        {
+            $sql = $this->dbconn->prepare("UPDATE Courses SET Name = ?, Progression = ?, PlanURL = ? WHERE Code = ?");
+            $sql->bind_param('ssss', $name, $prog, $plan, $code);
+            $sql->execute();
+        }
+
         function deleteCourse($code)
         {
             $sql = $this->dbconn->prepare("DELETE FROM Courses WHERE Code = ?");
@@ -64,11 +71,13 @@
             break;
             
         case "PUT":
-            
+            $input = json_decode(file_get_contents('php://input'), true);
+            $courses->updateCourse($input['code'], $input['name'], $input['progression'], $input['plan']);
             break;
-            
+
         case "POST":
-            
+            $input = json_decode(file_get_contents('php://input'), true);
+            $courses->addCourse($input['code'], $input['name'], $input['progression'], $input['plan']);
             break;
             
         case "DELETE":
